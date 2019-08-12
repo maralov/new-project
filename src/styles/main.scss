@@ -1,0 +1,10 @@
+@import "normalize";
+@import "./helpers/variables";
+@import "./helpers/mixins";
+@import "./vendor/libs";
+@import "./base/fonts";
+@import "./base/base";
+
+// BEM blocks
+
+@import "./../blocks/blocks"; 

@@ -1,0 +1,44 @@
+// ADAPTATION BREAKPOINTS AND IMPLEMENT MIXIN
+
+
+$min-screen-xl: 1399.98px; 	 // Large desktops
+$max-screen-lg: 1399.98px;	 // Laptop and small desktops
+$max-screen-md: 1024px; 		 // Tablets and small Laptop
+$max-screen-sm: 768px; 		   // Tablets and small Laptop
+$max-screen-xs: 576px; 		   // Tablets and small Laptop
+
+
+//  Large desktops
+@mixin media-min-xl {
+	@media screen and ( min-width: #{$min-screen-xl} ) {
+		@content;
+	}
+}
+
+// Laptop and small desktops
+@mixin media-max-lg {
+	@media screen and ( max-width: #{$max-screen-lg} ) {
+		@content;
+	}
+}
+
+// Tablets and small Laptop
+@mixin media-max-md {
+	@media screen and ( max-width: #{$max-screen-md} ) {
+		@content;
+	}
+}
+
+// Tablets and small Laptop
+@mixin media-max-sm {
+	@media screen and ( max-width: #{$max-screen-sm} ) {
+		@content;
+	}
+}
+
+// Tablets and small Laptop
+@mixin breakpoint-max-xs {
+	@media screen and ( max-width: #{$max-screen-xs} ) {
+		@content;
+	}
+}
