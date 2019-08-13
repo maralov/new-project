@@ -313,6 +313,8 @@
  
  img {
    border: 0;
+   width: 100%;
+   height: auto;
    @if $legacy_browser_support {
      *-ms-interpolation-mode: bicubic; /* 2 */
    }
