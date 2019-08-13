@@ -49,12 +49,13 @@ const fileInclude = () => {
     .pipe(gulp.dest(path.build.html))
     .pipe(browserSync.stream());
 } 
+
 const styles = () => {
   return gulp
     .src(path.src.sass)
     .pipe(plumber())
     .pipe(sourcemaps.init())
-    .pipe(sass({includePaths: require('node-normalize-scss').includePaths}))
+    .pipe(sass(/* {includePaths: require('node-normalize-scss').includePaths} */))
     .pipe(autoprefixer({
       overrideBrowserslist: ['last 2 versions'],
       cascade: false
@@ -71,20 +72,12 @@ const clear = () => {
   return del(path.clear.clear);
 };
 
-/* const html = () => {
-  return gulp.src(path.src.html)
-    .pipe(plumber())
-    .pipe(gulp.dest(path.build.html))
-    .pipe(browserSync.stream());
-};
- */
 const watch = () => {
   browserSync.init({
     server: {
       baseDir: "./build"
     },
     notify: false
-
   });
   gulp.watch(path.watch.sass, styles);
   gulp.watch(path.watch.html, browserSync.stream()); 
