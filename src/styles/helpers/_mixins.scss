@@ -24,7 +24,7 @@ $max-screen-xs: 576px; 		   // Tablets and small Laptop
 
 // Tablets and small Laptop
 @mixin media-max-md {
-	@media screen and ( max-width: #{$max-screen-md} ) {
+	@media (max-width: #{$max-screen-md} ) {
 		@content;
 	}
 }
@@ -37,7 +37,7 @@ $max-screen-xs: 576px; 		   // Tablets and small Laptop
 }
 
 // Tablets and small Laptop
-@mixin breakpoint-max-xs {
+@mixin media-max-xs {
 	@media screen and ( max-width: #{$max-screen-xs} ) {
 		@content;
 	}

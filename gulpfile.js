@@ -61,7 +61,17 @@ const styles = () => {
       cascade: false
     }))
     .pipe(gcmq())
-    .pipe(cleanCSS())
+    .pipe(cleanCSS({
+        level: {
+          1: {
+            all: true,
+            normalizeUrls: false
+          },
+          2: {
+            restructureRules: true
+          }
+        }
+    }))
     .pipe(rename({suffix: ".min"}))
     .pipe(sourcemaps.write()) 
     .pipe(gulp.dest(path.build.css))
