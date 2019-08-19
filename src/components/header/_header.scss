@@ -1,6 +1,8 @@
-a {
-  color: red;
-    @include media-max-md {
-      color: green;
+header {
+  font-size: 2em;
+  text-decoration: none;
+  @include media-max-md {
+    font-size: 3em;
   }
 }
+

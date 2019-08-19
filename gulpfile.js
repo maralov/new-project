@@ -8,7 +8,15 @@ const gulp            = require('gulp'),
       gcmq            = require('gulp-group-css-media-queries'),
       cleanCSS        = require('gulp-clean-css'),
       fileinclude     = require('gulp-file-include'),
-      rename          = require("gulp-rename");
+      rename          = require("gulp-rename"),
+      gulpif          = require('gulp-if'),
+      svgSprite       = require('gulp-svg-sprites'),
+	    svgmin          = require('gulp-svgmin'),
+	    cheerio         = require('gulp-cheerio'),
+	    replace         = require('gulp-replace');
+
+const isDev = process.argv.indexOf('--dev') !== -1;
+const isProd = process.argv.indexOf('--prod') !== -1;
 
 const path = {
   src: {
@@ -54,7 +62,7 @@ const styles = () => {
   return gulp
     .src(path.src.sass)
     .pipe(plumber())
-    .pipe(sourcemaps.init())
+    .pipe(gulpif(isDev, sourcemaps.init()))
     .pipe(sass(/* {includePaths: require('node-normalize-scss').includePaths} */))
     .pipe(autoprefixer({
       overrideBrowserslist: ['last 2 versions'],
@@ -90,7 +98,6 @@ const watch = () => {
     notify: false
   });
   gulp.watch(path.watch.sass, styles);
-  gulp.watch(path.watch.html, browserSync.stream()); 
   gulp.watch(path.watch.html, fileInclude);
 };
 
