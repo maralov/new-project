@@ -24,19 +24,22 @@ const path = {
     sass:     'src/styles/*.scss',
     js:       'src/js/*.js',
     jsVen:    'src/js/**/*.js',
-    img:      ''
+    svg:      '/src/media-files/img/svg-icons/*.svg'
   },
   build: {
     html:     'build/',
     css:      'build/assets/styles',
     js:       'build/assets/js',
     jsVen:    'build/assets/js/vendor',
-    img:      ''
+    svg:      'src/media-files/img/svg-sprites',
+    img:      'build/assets/img/'
+   
   },
   watch: { 
     html:       'src/**/*.html',
     sass:       'src/**/*.scss',
     js:         'app/js/*.js',
+    svg:        'src/media-files/img/svg-icons/*.svg',
     img:        ''
   },
   clear : {
@@ -90,6 +93,34 @@ const clear = () => {
   return del(path.clear.clear);
 };
 
+const svg = () => {
+  return gulp
+  .src(path.src.svg)
+  .pipe(svgmin({
+    js2svg: {
+      pretty: true
+    }
+  }))
+  .pipe(cheerio({
+    run: function ($) {
+      $('[fill]').removeAttr('fill');
+      $('[style]').removeAttr('style');
+    },
+    parserOptions: { xmlMode: true }
+  }))
+  .pipe(replace('&gt;', '>'))
+  .pipe(svgSprite({
+    mode: "symbols",
+    preview: false,
+    selector: "icon-%f",
+    svg: {
+      symbols:  'svg-sprite.html'
+    }
+  }
+  ))
+    .pipe(gulp.dest(path.build.svg));
+}
+
 const watch = () => {
   browserSync.init({
     server: {
@@ -99,9 +130,10 @@ const watch = () => {
   });
   gulp.watch(path.watch.sass, styles);
   gulp.watch(path.watch.html, fileInclude);
+  gulp.watch(path.watch.svg, svg);
+
 };
 
-
-const build = gulp.series(clear, gulp.parallel(styles,fileInclude));
+const build = gulp.series(clear, gulp.parallel(styles, svg, fileInclude));
 
 gulp.task('default', gulp.series(build, watch));
