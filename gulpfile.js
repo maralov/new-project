@@ -13,18 +13,22 @@ const gulp            = require('gulp'),
       svgSprite       = require('gulp-svg-sprites'),
 	    svgmin          = require('gulp-svgmin'),
 	    cheerio         = require('gulp-cheerio'),
-	    replace         = require('gulp-replace');
+      replace         = require('gulp-replace'),
+      tinypng         = require('gulp-tinypng');
 
-const isDev = process.argv.indexOf('--dev') !== -1;
-const isProd = process.argv.indexOf('--prod') !== -1;
 
+const isDev = process.argv.indexOf('--dev') !== -1; //develop mode
+const isProd = process.argv.indexOf('--prod') !== -1;// production mode
+
+//============================================== path ====================================================
 const path = {
   src: {
     html:     'src/pages/*.html',
     sass:     'src/styles/*.scss',
     js:       'src/js/*.js',
     jsVen:    'src/js/**/*.js',
-    svg:      'src/media-files/img/svg-icons/*.svg'
+    svg:      'src/media-files/img/*.svg',
+    img:      'src/media-files/img/**/*.+(jpg|png)'
   },
   build: {
     html:     'build/',
@@ -39,14 +43,16 @@ const path = {
     html:       'src/**/*.html',
     sass:       'src/**/*.scss',
     js:         'app/js/*.js',
-    svg:        'src/media-files/img/svg-icons/*.svg',
-    img:        ''
+    svg:        'src/media-files/img/*.svg',
+    img:        'src/media-files/img/**/*.+(jpg|png)'
   },
   clear : {
-    clean:      'build/*'
+    clean:      'build/*',
+    cleanImg:   'build/assets/img/'
+
   }
 };
-
+//============================================== fileInclude ====================================================
 const fileInclude = () => {
   return gulp
     .src(path.src.html)
@@ -60,7 +66,7 @@ const fileInclude = () => {
     .pipe(gulp.dest(path.build.html))
     .pipe(browserSync.stream());
 } 
-
+//============================================== SASS ====================================================
 const styles = () => {
   return gulp
     .src(path.src.sass)
@@ -88,11 +94,18 @@ const styles = () => {
     .pipe(gulp.dest(path.build.css))
     .pipe(browserSync.stream());
 };
+//============================================== SCRIPTS ====================================================
 
-const clear = () => {
+
+
+//============================================== clear ====================================================
+const clearBuild = () => {
   return del(path.clear.clean);
 };
-
+const clearImg = () => {
+  return del(path.clear.cleanImg);
+};
+//============================================== IMAGES ====================================================
 const svg = () => {
   return gulp.src(path.src.svg)
   .pipe(svgmin({
@@ -120,6 +133,16 @@ const svg = () => {
     .pipe(gulp.dest(path.build.svg));
 }
 
+const image = () => {
+  return gulp
+    .src(path.src.img)
+      .pipe(gulpif(isProd, tinypng('vWq20TzzZr7fgWXDGFS8gGdVHd8y0VTk')))// free 500 img per month; get new API key or pay - visit https://tinypng.com
+      .pipe(rename(function(path) {
+        path.dirname = ''
+      }))
+      .pipe(gulp.dest(path.build.img));
+};
+//============================================== watcher ====================================================
 const watch = () => {
   browserSync.init({
     server: {
@@ -130,9 +153,14 @@ const watch = () => {
   gulp.watch(path.watch.sass, styles);
   gulp.watch(path.watch.html, fileInclude);
   gulp.watch(path.watch.svg, svg);
-
+  gulp.watch(path.watch.img, gulp.series(clearImg, image));
 };
 
-const build = gulp.series(clear, gulp.parallel(styles, svg, fileInclude));
+//============================================== TASK ====================================================
+const build = gulp.series(clearBuild, 
+  gulp.parallel(styles, svg, image, fileInclude));
 
 gulp.task('default', gulp.series(build, watch));
+
+// nmp run dev - start gulp development mode
+// nmp run prod - start gulp production mode
