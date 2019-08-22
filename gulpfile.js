@@ -24,7 +24,7 @@ const path = {
     sass:     'src/styles/*.scss',
     js:       'src/js/*.js',
     jsVen:    'src/js/**/*.js',
-    svg:      '/src/media-files/img/svg-icons/*.svg'
+    svg:      'src/media-files/img/svg-icons/*.svg'
   },
   build: {
     html:     'build/',
@@ -43,7 +43,7 @@ const path = {
     img:        ''
   },
   clear : {
-    clear:      'build/*'
+    clean:      'build/*'
   }
 };
 
@@ -90,12 +90,11 @@ const styles = () => {
 };
 
 const clear = () => {
-  return del(path.clear.clear);
+  return del(path.clear.clean);
 };
 
 const svg = () => {
-  return gulp
-  .src(path.src.svg)
+  return gulp.src(path.src.svg)
   .pipe(svgmin({
     js2svg: {
       pretty: true
@@ -114,7 +113,7 @@ const svg = () => {
     preview: false,
     selector: "icon-%f",
     svg: {
-      symbols:  'svg-sprite.html'
+      symbols:'svg-sprite.html'
     }
   }
   ))
