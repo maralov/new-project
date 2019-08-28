@@ -10,7 +10,7 @@ const gulp            = require('gulp'),
       gcmq            = require('gulp-group-css-media-queries'),
       cleanCSS        = require('gulp-clean-css'),
       fileinclude     = require('gulp-file-include'),
-      concat          = require("gulp-concat"),
+      // concat          = require("gulp-concat"),
       rename          = require("gulp-rename"),
       gulpif          = require('gulp-if'),
       svgSprite       = require('gulp-svg-sprites'),
@@ -18,9 +18,13 @@ const gulp            = require('gulp'),
 	    cheerio         = require('gulp-cheerio'),
       replace         = require('gulp-replace'),
       tinypng         = require('gulp-tinypng'),
-      jshint          = require("gulp-jshint"),
-      babel           = require("gulp-babel"),
-      uglify          = require('gulp-uglify');
+      // jshint          = require("gulp-jshint"),
+      // babel           = require("gulp-babel"),
+      browserify      = require('browserify'),
+      source          = require('vinyl-source-stream'),
+      buffer          = require('vinyl-buffer'),
+      uglify          = require('gulp-uglify'),
+      babelify        = require('babelify');
 
 
 const isDev = process.argv.indexOf('--dev') !== -1; //develop mode
@@ -31,7 +35,7 @@ const path = {
   src: {
     html:     'src/pages/*.html',
     sass:     'src/styles/*.scss',
-    js:       'src/js/*.js',
+    js:       'src/js/index.js',
     jsVen:    'src/js/vendor/*.js',
     svg:      'src/media-files/img/**/*.svg',
     fonts:    'src/fonts/**/*{ttf,woff,woff2,svg,eot}',
@@ -45,9 +49,9 @@ const path = {
     svg:      'src/media-files/img/svg-sprites',
     fonts:    'build/assets/fonts',
     img:      'build/assets/img'
-   
+
   },
-  watch: { 
+  watch: {
     html:       'src/**/*.html',
     sass:       'src/**/*.scss',
     js:         'src/js/**/*.js',
@@ -99,7 +103,7 @@ const styles = () => {
         }
     })))
     .pipe(rename({suffix: ".min"}))
-    .pipe(gulpif(isDev, sourcemaps.write())) 
+    .pipe(gulpif(isDev, sourcemaps.write()))
     .pipe(gulp.dest(path.build.css))
     .pipe(browserSync.stream())
 };
@@ -112,24 +116,39 @@ const jsVen = () => {
   .pipe(uglify())
   .pipe(rename({suffix: ".min"}))
   .pipe(gulp.dest(path.build.jsVen))
-  
 };
+
+// const js = () => {
+//   return gulp
+//   .src(path.src.js)
+//   .pipe(gulpif(isDev, sourcemaps.init()))
+//   .pipe(babel({"presets": ["@babel/preset-env"]}))
+//   .pipe(jshint())
+//   .pipe(uglify())
+//   .pipe(concat("main.min.js"))
+//   .pipe(gulpif(isDev, sourcemaps.write()))
+//   .pipe(gulp.dest(path.build.js))
+//   .pipe(browserSync.stream())
+// };
+
+
 
 const js = () => {
-  return gulp
-  .src(path.src.js)
-  .pipe(gulpif(isDev, sourcemaps.init()))
-  .pipe(babel({"presets": ["@babel/preset-env"]}))
-  .pipe(jshint())
-  .pipe(uglify())
-  .pipe(concat("main.min.js"))
-  .pipe(gulpif(isDev, sourcemaps.write()))
-  .pipe(gulp.dest(path.build.js))
-  .pipe(browserSync.stream())
-};
+  return browserify(path.src.js)
+    .transform('babelify', {
+      presets: ['es2015']
+    })
+    .bundle()
+    .pipe(source('index.js'))
+    .pipe(buffer())
+    .pipe(uglify())
+    .pipe(rename('index.min.js'))
+    .pipe(gulp.dest(path.build.js))
+    .pipe(browserSync.stream())
+}
 
 const scripts = gulp.parallel(jsVen, js)
- 
+
 
 //============================================== clear ====================================================
 
@@ -143,9 +162,10 @@ const clearBuild = () => {
 const svg = () => {
   return gulp.src(path.src.svg)
   .pipe(svgmin({
-    js2svg: {
-      pretty: true
-    }
+      js2svg: {
+        pretty: true
+      }
+
   }))
   .pipe(cheerio({
     run: function ($) {
@@ -200,7 +220,7 @@ const watch = () => {
 };
 
 //============================================== TASK ====================================================
-const build = gulp.series(clearBuild, 
+const build = gulp.series(clearBuild,
   gulp.parallel(scripts, styles, svg, image, fonts, fileInclude)
 );
 
