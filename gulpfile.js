@@ -10,6 +10,7 @@ const gulp            = require('gulp'),
       gcmq            = require('gulp-group-css-media-queries'),
       cleanCSS        = require('gulp-clean-css'),
       fileinclude     = require('gulp-file-include'),
+      concat          = require("gulp-concat"),
       rename          = require("gulp-rename"),
       gulpif          = require('gulp-if'),
       svgSprite       = require('gulp-svg-sprites'),
@@ -30,9 +31,10 @@ const path = {
   src: {
     html:     'src/pages/*.html',
     sass:     'src/styles/*.scss',
-    js:       'src/js/main.js',
+    js:       'src/js/*.js',
     jsVen:    'src/js/vendor/*.js',
-    svg:      'src/media-files/img/*.svg',
+    svg:      'src/media-files/img/**/*.svg',
+    fonts:    'src/fonts/**/*{ttf,woff,woff2,svg,eot}',
     img:      'src/media-files/img/**/*.+(jpg|png)'
   },
   build: {
@@ -41,21 +43,19 @@ const path = {
     js:       'build/assets/js',
     jsVen:    'build/assets/js/vendor',
     svg:      'src/media-files/img/svg-sprites',
-    img:      'build/assets/img/'
+    fonts:    'build/assets/fonts',
+    img:      'build/assets/img'
    
   },
   watch: { 
     html:       'src/**/*.html',
     sass:       'src/**/*.scss',
     js:         'src/js/**/*.js',
-    svg:        'src/media-files/img/*.svg',
+    svg:        'src/media-files/img/**/*.svg',
+    fonts:      'src/fonts/**/*{ttf,woff,woff2,svg,eot}',
     img:        'src/media-files/img/**/*.+(jpg|png)'
   },
-  clear : {
-    clean:      'build/*',
-    cleanImg:   'build/assets/img/'
-
-  }
+  clear : 'build/*'
 };
 
 //============================================== fileInclude ====================================================
@@ -119,11 +119,10 @@ const js = () => {
   return gulp
   .src(path.src.js)
   .pipe(gulpif(isDev, sourcemaps.init()))
-  .pipe(babel())
+  .pipe(babel({"presets": ["@babel/preset-env"]}))
   .pipe(jshint())
-  .pipe(jshint.reporter("default"))
   .pipe(uglify())
-  .pipe(rename({suffix: ".min"}))
+  .pipe(concat("main.min.js"))
   .pipe(gulpif(isDev, sourcemaps.write()))
   .pipe(gulp.dest(path.build.js))
   .pipe(browserSync.stream())
@@ -135,11 +134,9 @@ const scripts = gulp.parallel(jsVen, js)
 //============================================== clear ====================================================
 
 const clearBuild = () => {
-  return del(path.clear.clean);
+  return del(path.clear);
 };
-const clearImg = () => {
-  return del(path.clear.cleanImg);
-}; 
+
 
 //============================================== SVG ====================================================
 
@@ -180,6 +177,12 @@ const image = () => {
       }))
       .pipe(gulp.dest(path.build.img))
 };
+//============================================== FONTS ====================================================
+const fonts = () => {
+  return gulp
+    .src(path.src.fonts)
+    .pipe(gulp.dest(path.build.fonts))
+};
 //============================================== watcher ====================================================
 const watch = () => {
   browserSync.init({
@@ -191,13 +194,14 @@ const watch = () => {
   gulp.watch(path.watch.sass, styles);
   gulp.watch(path.watch.html, fileInclude);
   gulp.watch(path.watch.svg, svg);
-  gulp.watch(path.watch.img, gulp.series(clearImg, image));
+  gulp.watch(path.watch.img, image);
   gulp.watch(path.watch.js, js);
+  gulp.watch(path.watch.fonts, fonts);
 };
 
 //============================================== TASK ====================================================
 const build = gulp.series(clearBuild, 
-  gulp.parallel(scripts, styles, svg, image, fileInclude)
+  gulp.parallel(scripts, styles, svg, image, fonts, fileInclude)
 );
 
 gulp.task('default', gulp.series(build, watch));

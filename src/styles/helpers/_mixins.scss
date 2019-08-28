@@ -1,11 +1,11 @@
 // ADAPTATION BREAKPOINTS AND IMPLEMENT MIXIN
 
 
-$min-screen-xl: 1399.98px; 	 // Large desktops
-$max-screen-lg: 1399.98px;	 // Laptop and small desktops
-$max-screen-md: 1024px; 		 // Tablets and small Laptop
-$max-screen-sm: 768px; 		   // Tablets and small Laptop
-$max-screen-xs: 576px; 		   // Tablets and small Laptop
+$screen-xl: 1399.98px; 	 // Large desktops
+$screen-lg: 1399.98px;	 // Laptop and small desktops
+$screen-md: 1024px; 		 // Tablets and small Laptop
+$screen-sm: 768px; 		   // Tablets and small Laptop
+$screen-xs: 576px; 		   // Tablets and small Laptop
 
 
 //  Large desktops
@@ -17,28 +17,48 @@ $max-screen-xs: 576px; 		   // Tablets and small Laptop
 
 // Laptop and small desktops
 @mixin media-max-lg {
-	@media screen and ( max-width: #{$max-screen-lg} ) {
+	@media screen and ( max-width: #{$screen-lg} ) {
+		@content;
+	}
+}
+@mixin media-min-lg {
+	@media screen and (min-width:  #{$screen-lg} ) {
 		@content;
 	}
 }
 
 // Tablets and small Laptop
 @mixin media-max-md {
-	@media (max-width: #{$max-screen-md} ) {
+	@media screen and (max-width: #{$screen-md} ) {
+		@content;
+	}
+}
+@mixin media-min-md {
+	@media screen and (min-width: #{$screen-md} ) {
 		@content;
 	}
 }
 
 // Tablets and small Laptop
 @mixin media-max-sm {
-	@media screen and ( max-width: #{$max-screen-sm} ) {
+	@media screen and ( max-width: #{$screen-sm} ) {
+		@content;
+	}
+}
+@mixin media-min-sm {
+	@media screen and ( min-width: #{$screen-sm} ) {
 		@content;
 	}
 }
 
 // Tablets and small Laptop
 @mixin media-max-xs {
-	@media screen and ( max-width: #{$max-screen-xs} ) {
+	@media screen and ( max-width: #{$screen-xs} ) {
+		@content;
+	}
+}
+@mixin media-min-xs {
+	@media screen and ( min-width: #{$screen-xs} ) {
 		@content;
 	}
 }
