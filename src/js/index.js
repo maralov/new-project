@@ -1,3 +1,2 @@
-import log from './modules/log'
-
-log($('body').addClass('dsfgdfg'))
+require('./index2.js');
+require('./index3.js');

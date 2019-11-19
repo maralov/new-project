@@ -1,10 +1,9 @@
 
-/* @import "./vendor/libs"; */
-@import "./helpers/variables";
-@import "./helpers/mixins";
-@import "./base/fonts";
-@import "./base/base";
+@import "./vendor/index";
+@import "./helpers/index";
+@import "./base/index";
+
 
 // BEM blocks
 
-@import "./../components/components"; 
+@import "./../components/index"; 
